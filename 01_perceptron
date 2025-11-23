@@ -1,1 +1,68 @@
+import math
+import random
 
+def sigmoid(z):
+    
+    return 1 / (1 + math.exp(-z))
+    
+
+def forward_neuron(x , w, b):
+    # z = b + w1*x1 + w2*x2 + ...
+    z = b + sum(w[i] * x[i] for i in range(len(x)))
+    y_pred = sigmoid(z)
+
+    return y_pred , z
+
+
+# loss cross entropy
+def lossCE (y ,y_pred ): # cross entropy function
+
+    epsilon = 1e-5 #   log(0)!!!
+    return -( y * math.log(y_pred + epsilon) + (1 - y) * math.log(1 - y_pred + epsilon))
+
+
+def neuron_backward(x ,y_pred ,y ,z , w, b, leaningrate = 0.1):
+    
+    dz = y_pred - y
+
+    dw = [dz * xi for xi in x]
+    db = dz
+
+    # weight update
+    w = [w[i] - leaningrate * dw[i] for i in range(len(w))]
+
+    b = b - leaningrate * db
+
+    return w , b
+
+
+
+
+data = [ 
+    ([0, 0], 0),
+    ([0, 1], 0),
+    ([1, 0], 0),
+    ([1, 1], 1),
+    ([2, 0], 1),
+]
+
+
+# training 
+
+w = [random.uniform(-1, 1), random.uniform(-1, 1)]
+b = 0
+
+
+
+for epoch in range (1900):
+    total_loss = 0
+    for x, y in data:
+
+        y_pred ,z = forward_neuron(x , w, b)
+
+        total_loss += lossCE(y, y_pred)
+
+        w, b = neuron_backward(x, y_pred, y, z, w, b, leaningrate=0.1)
+    
+    if epoch % 100 == 0:
+        print (f'epoch : {epoch} , Total Loss : {total_loss}')
